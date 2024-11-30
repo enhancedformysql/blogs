@@ -8,6 +8,8 @@ Extract some insightful technical points from the book "The Art of Problem-Solvi
 
 # Table of Contents
 
+[Analysis of the Root Causes of MySQL Performance Degradation](sysbench_perf_degradation.md)
+
 [How can the scalability of MySQL be improved](scalability.md)
 
 [How to explain why Repeatable Read surprisingly outperforms Read Committed?](isolation.md)
@@ -43,5 +45,3 @@ Extract some insightful technical points from the book "The Art of Problem-Solvi
 # Errata
 
 If you find any errata in the book, [please open a new issue](https://github.com/enhancedformysql/The-Art-of-Problem-Solving-in-Software-Engineering_How-to-Make-MySQL-Better/issues).
-
-
