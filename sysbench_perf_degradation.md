@@ -483,7 +483,13 @@ The so-called 'premature optimization' is the root of all evil, and it does not 
 
 The main reasons for the decline in write performance are related to MTR commit issues, instant add/drop column, and several other factors. These are difficult to optimize in traditional ways. However, users can compensate for the performance drop through PGO optimization. With a proper strategy, the performance can generally be kept stable.
 
-For batch insert performance degradation, our open-source version [2] replaces the official deque with an improved list implementation. This primarily addresses memory efficiency issues and can partially alleviate performance decline. By combining PGO optimization with our open-source version, batch insert performance can approach that of MySQL 5.7. Users can also leverage multiple threads for concurrent batch processing, fully utilizing the improved concurrency of the redo log, which can significantly boost batch insert performance.
+For batch insert performance degradation, our open-source version [2] replaces the official deque with an improved list implementation. This primarily addresses memory efficiency issues and can partially alleviate performance decline. By combining PGO optimization with our open-source version, batch insert performance can approach that of MySQL 5.7. 
+
+<img src="images/image-bulk-insert-optimize.png" alt="image-bulk-insert-optimize.png" style="zoom:150%;" />
+
+Figure 8-39. Optimized MySQL 8.0.40 with PGO performs roughly on par with version 5.7.
+
+Users can also leverage multiple threads for concurrent batch processing, fully utilizing the improved concurrency of the redo log, which can significantly boost batch insert performance.
 
 Regarding update index issues, due to the inevitable addition of new code, PGO optimization can help mitigate this problem. Our PGO version [2] can significantly alleviate this issue.
 
@@ -491,8 +497,7 @@ For read performance, particularly join performance, we have made substantial im
 
 <img src="images/image-join-improve.png" alt="image-join-improve.png" style="zoom:150%;" />
 
-Figure 3. Join performance optimization with PGO leads to significant
-improvements.
+Figure 4. Using PGO, along with our optimizations, can lead to significant improvements in join performance.
 
 We will continue to invest time in optimizing low-concurrency performance. This process is long but involves numerous areas that need improvement.
 
