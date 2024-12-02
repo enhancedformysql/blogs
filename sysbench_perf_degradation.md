@@ -487,7 +487,7 @@ For batch insert performance degradation, our open-source version [2] replaces t
 
 <img src="images/image-bulk-insert-optimize.png" alt="image-bulk-insert-optimize.png" style="zoom:150%;" />
 
-Figure 8-39. Optimized MySQL 8.0.40 with PGO performs roughly on par with version 5.7.
+Figure 3. Optimized MySQL 8.0.40 with PGO performs roughly on par with version 5.7.
 
 Users can also leverage multiple threads for concurrent batch processing, fully utilizing the improved concurrency of the redo log, which can significantly boost batch insert performance.
 
