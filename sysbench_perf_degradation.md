@@ -2,12 +2,11 @@
 
 Users tend to notice a decline in low-concurrency performance more easily, while improvements in high-concurrency performance are often harder to perceive. Therefore, maintaining low-concurrency performance is crucial, as it directly affects user experience and the willingness to upgrade [1].
 
-According to extensive user feedback, after upgrading to MySQL 8.0, users have generally perceived a decline in performance, particularly in batch insert and join operations. This downward trend has become more evident with each version update. Additionally, some MySQL enthusiasts and testers have reported performance degradation in multiple sysbench tests after upgrading.
+According to extensive user feedback, after upgrading to MySQL 8.0, users have generally perceived a decline in performance, particularly in batch insert and join operations. This downward trend has become more evident in higher versions of MySQL. Additionally, some MySQL enthusiasts and testers have reported performance degradation in multiple sysbench tests after upgrading.
 
 Can these performance issues be avoided? Or, more specifically, how should we scientifically assess the ongoing trend of performance decline? These are important questions to consider.
 
-Although the official team continues to optimize, the gradual deterioration of performance cannot be overlooked. In certain scenarios, there may appear to be improvements, but this does not mean that performance in all scenarios is equally optimized. Performance optimization is a very complex task that can easily lead to
-generalizations. Moreover, it's also easy to optimize performance for specific scenarios at the cost of degrading performance in other areas.
+Although the official team continues to optimize, the gradual deterioration of performance cannot be overlooked. In certain scenarios, there may appear to be improvements, but this does not mean that performance in all scenarios is equally optimized. Moreover, it's also easy to optimize performance for specific scenarios at the cost of degrading performance in other areas.
 
 ## 1 The Root Causes of MySQL Performance Decline
 
@@ -76,30 +75,23 @@ Unfortunately, many times it is precisely the motivations behind these code impr
 documentation:
 
 ```
-std::deque (double-ended queue) is an indexed sequence container that
-allows fast insertion and deletion at both its beginning and its end.
-In addition, insertion and deletion at either end of a deque never
-invalidates pointers or references to the rest of the elements.
+std::deque (double-ended queue) is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end. 
+In addition, insertion and deletion at either end of a deque never invalidates pointers or references to the rest of the elements.
 
-As opposed to std::vector, the elements of a deque are not stored
-contiguously: typical implementations use a sequence of individually
-allocated fixed-size arrays, with additional bookkeeping, which means
-indexed access to deque must perform two pointer dereferences,
+As opposed to std::vector, the elements of a deque are not stored contiguously: typical implementations use a sequence of individually 
+allocated fixed-size arrays, with additional bookkeeping, which means indexed access to deque must perform two pointer dereferences, 
 compared to vector's indexed access which performs only one.
 
-The storage of a deque is automatically expanded and contracted as
-needed. Expansion of a deque is cheaper than the expansion of a
-std::vector because it does not involve copying of the existing
-elements to a new memory location. On the other hand, deques typically
-have large minimal memory cost; a deque holding just one element has
-to allocate its full internal array (e.g. 8 times the object size on
-64-bit libstdc++; 16 times the object size or 4096 bytes, whichever is
-larger, on 64-bit libc++).
+The storage of a deque is automatically expanded and contracted as needed. Expansion of a deque is cheaper than the expansion of a
+std::vector because it does not involve copying of the existing elements to a new memory location. On the other hand, deques typically 
+have large minimal memory cost; a deque holding just one element has to allocate its full internal array (e.g. 8 times the object size 
+on 64-bit libstdc++; 16 times the object size or 4096 bytes, whichever is larger, on 64-bit libc++).
 
 The complexity (efficiency) of common operations on deques is as follows:
 Random access - constant O(1).
 Insertion or removal of elements at the end or beginning - constant O(1).
 Insertion or removal of elements - linear O(n).
+
 ```
 
 As shown in the above description, in extreme cases, retaining a single element requires allocating the entire array, resulting in very low memory efficiency. For example, in bulk inserts, where a large number of records need to be inserted, the official implementation stores each record in a separate deque. Even if the record content is minimal, a deque must still be allocated. The MySQL deque implementation allocates 1KB of memory for each deque to support fast lookups.
